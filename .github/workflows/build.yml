@@ -46,14 +46,14 @@ jobs:
         run: mvn clean package
 
       - name: Upload artifact for dev versions
-        if: contains(steps.get_version.outputs.version, 'dev')
+        if: contains(toLower(steps.get_version.outputs.version), 'dev')
         uses: actions/upload-artifact@v4
         with:
           name: MyVillage-${{ steps.get_version.outputs.version }}-${{ github.run_number }}-${{ steps.short_sha.outputs.sha }}.jar
-          path: target/MyVillage.jar
+          path: target/*-DEV-shaded.jar
 
       - name: Create GitHub Release for stable versions
-        if: "!contains(steps.get_version.outputs.version, 'dev')"
+        if: not(contains(toLower(steps.get_version.outputs.version), 'dev'))
         id: create_release
         uses: ncipollo/release-action@v1
         with:
@@ -67,6 +67,6 @@ jobs:
         if: "!contains(steps.get_version.outputs.version, 'dev')"
         uses: softprops/action-gh-release@v1
         with:
-          files: target/MyVillage.jar
+          files: target/*-shaded.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
