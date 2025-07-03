@@ -29,25 +29,20 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-maven-
 
-    - name: Install xmllint
-      run: sudo apt-get update && sudo apt-get install -y libxml2-utils
-
     - name: Extract version from pom.xml
       id: get_version
       run: |
-        # wyciągamy pierwszy <version>...</version> w pom.xml
         VERSION=$(grep -m1 '<version>' pom.xml | sed -E 's:.*<version>([^<]+)</version>.*:\1:')
         echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Extracted version is '$VERSION'"
 
-    - name: Debug version extracted
-      run: echo "Extracted version is '${{ steps.get_version.outputs.version }}'"
 
     - name: Get short SHA
       id: short_sha
-      run: echo "sha=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+      run: |
+        echo "sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+        echo "Short SHA is '${GITHUB_SHA::7}'"
 
-    - name: Debug short SHA
-      run: echo "Short SHA is '${{ steps.short_sha.outputs.sha }}'"
 
     - name: Check if version is dev (case insensitive)
       id: check_dev
@@ -63,9 +58,6 @@ jobs:
           echo "Detected stable version."
         fi
 
-    - name: Debug is_dev
-      run: echo "is_dev = ${{ steps.check_dev.outputs.is_dev }}"
-
     - name: Build JAR with Maven Shade plugin
       run: mvn clean package
 
@@ -77,11 +69,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: MyVillage-${{ steps.get_version.outputs.version }}-${{ github.run_number }}-${{ steps.short_sha.outputs.sha }}.jar
-        path: target/MyVillage-*.jar
-
-    - name: List files in target after uploading dev artifact
-      if: steps.check_dev.outputs.is_dev == 'true'
-      run: ls -l target
+        path: target/*-shaded.jar
 
     - name: Create GitHub Release for stable versions
       if: steps.check_dev.outputs.is_dev == 'false'
@@ -94,10 +82,6 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: List files in target after creating release
-      if: steps.check_dev.outputs.is_dev == 'false'
-      run: ls -l target
-
     - name: Upload release asset
       if: steps.check_dev.outputs.is_dev == 'false'
       uses: softprops/action-gh-release@v1
@@ -106,7 +90,3 @@ jobs:
         files: target/*-shaded.jar
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: List files in target after uploading release asset
-      if: steps.check_dev.outputs.is_dev == 'false'
-      run: ls -l target
