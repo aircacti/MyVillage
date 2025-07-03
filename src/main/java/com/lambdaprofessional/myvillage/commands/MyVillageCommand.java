@@ -451,7 +451,7 @@ public class MyVillageCommand implements CommandExecutor {
 
     private void behaviorCreate(CommandSender sender, String[] args) throws IOException {
         if (args.length < 5) {
-            Messenger.send(sender, true, "Usage: /myvillage behavior create [BEHAVIOR ID] [TYPE] [INSTRUCTION]", RED, "Available types:\n" + Helpers.BehaviorTypes.dashList + "\n\nInstruction placeholders:\n- '<player>' - player nick"); //todo: move to helpers
+            Messenger.send(sender, true, "Usage: /myvillage behavior create [BEHAVIOR ID] [TYPE] [INSTRUCTION]", RED, "Available types:\n" + Helpers.BehaviorTypes.dashList + "\n\nInstruction placeholders:\n" + Helpers.InstructionPlaceholders.dashList);
             return;
         }
 

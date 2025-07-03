@@ -84,4 +84,18 @@ public class Helpers {
 
     }
 
+    public static class InstructionPlaceholders {
+        private static final List<String> placeholders = Arrays.asList(
+                "'<player>' - player nick"
+        );
+
+        public static String commaList = String.join(", ", placeholders);
+
+        public static String dashList = placeholders.stream()
+                .map(s -> "- " + s)
+                .collect(Collectors.joining("\n"));
+
+
+    }
+
 }
