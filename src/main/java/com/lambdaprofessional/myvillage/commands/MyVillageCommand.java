@@ -459,7 +459,7 @@ public class MyVillageCommand implements CommandExecutor {
         switch (action) {
             case "create" -> behaviorCreate(sender, args);
             case "remove" -> behaviorRemove(sender, args);
-            case "list" -> behaviorList(sender);
+            case "list" -> behaviorList(sender, args);
             case "info" -> behaviorInfo(sender, args);
             default -> Messenger.send(sender, true, "Unknown behavior action: " + action, RED);
         }
