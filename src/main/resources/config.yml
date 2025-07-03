@@ -1,0 +1,17 @@
+# =========================================
+# MyVillage Plugin Config
+# Easily manage NPC Villagers
+#
+# Author: Lambda Professional
+# Website: https://lambda-professional.com/
+# =========================================
+
+# How often (in ticks) the plugin checks if all villagers are in place.
+# If some villagers are missing (e.g. due to mob-clearing plugins), they will be respawned.
+# Recommended: 72000 ticks (1 hour)
+check-every-ticks: 72000
+
+# Should the plugin display helpful debug messages?
+# Requires an additional permission to see these tips in-game.
+# Recommended: true
+do-tips: true

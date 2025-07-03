@@ -1,0 +1,12 @@
+name: MyVillage
+version: '${project.version}'
+main: com.lambdaprofessional.myvillage.MyVillage
+api-version: '1.21'
+authors: [Lambda Professional]
+description: Easily manage NPC Villagers
+website: https://lambda-professional.com/
+
+
+commands:
+  myvillage:
+    description: 'Manage villagers and behaviors'
