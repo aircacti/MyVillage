@@ -1,4 +1,4 @@
-package com.lambdaprofessional.myvillage.Inators;
+package com.lambdaprofessional.myvillage.inators;
 
 import com.lambdaprofessional.myvillage.configs.Hardcode;
 import com.lambdaprofessional.myvillage.objects.LambdaVillager;

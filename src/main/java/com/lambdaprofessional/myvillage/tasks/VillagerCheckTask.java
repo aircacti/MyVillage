@@ -1,6 +1,6 @@
 package com.lambdaprofessional.myvillage.tasks;
 
-import com.lambdaprofessional.myvillage.Inators.Spawninator;
+import com.lambdaprofessional.myvillage.inators.Spawninator;
 import com.lambdaprofessional.myvillage.MyVillage;
 import com.lambdaprofessional.myvillage.configs.UserConfig;
 import com.lambdaprofessional.myvillage.utils.Messenger;

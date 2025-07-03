@@ -1,6 +1,6 @@
 package com.lambdaprofessional.myvillage.events;
 
-import com.lambdaprofessional.myvillage.Inators.Spawninator;
+import com.lambdaprofessional.myvillage.inators.Spawninator;
 import com.lambdaprofessional.myvillage.configs.Hardcode;
 import com.lambdaprofessional.myvillage.configs.UserConfig;
 import com.lambdaprofessional.myvillage.objects.LambdaBehavior;
@@ -73,7 +73,7 @@ public class VillagerRightClickListener implements Listener {
             }
 
 
-            // Place holders
+            // Placeholders
             String instruction = lambdaBehavior.getInstruction().replace("<player>", player.getName());
 
             if (instruction.isBlank()) {
@@ -82,16 +82,9 @@ public class VillagerRightClickListener implements Listener {
             }
 
             switch (lambdaBehavior.getType()) {
-                case PLAYERCOMMAND -> {
-                    Messenger.info("Executing PLAYERCOMMAND for player '" + player.getName() + "': " + instruction); //todo: remove after tests
-                    Bukkit.dispatchCommand(player, instruction);
-                }
-                case CONSOLECOMMAND -> {
-                    Messenger.info("Executing CONSOLECOMMAND: " + instruction); //todo: remove after tests
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), instruction);
-                }
+                case PLAYERCOMMAND -> Bukkit.dispatchCommand(player, instruction);
+                case CONSOLECOMMAND -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), instruction);
                 case MESSAGE -> {
-                    Messenger.info("Executing MESSAGE: " + instruction); //todo: remove after tests
                     Component formattedInstruction = LegacyComponentSerializer.legacyAmpersand().deserialize(instruction);
                     player.sendMessage(formattedInstruction);
                 }
