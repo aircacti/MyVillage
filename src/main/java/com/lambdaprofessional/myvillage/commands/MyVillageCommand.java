@@ -192,7 +192,7 @@ public class MyVillageCommand implements CommandExecutor {
             case "forget" -> villagerForgetBehavior(sender, args);
             case "learn" -> villagerLearnBehavior(sender, args);
             case "remove" -> villagerRemove(sender, args);
-            case "list" -> villagerList(sender);
+            case "list" -> villagerList(sender, args);
             case "info" -> villagerInfo(sender, args);
             case "tp" -> villagerTp(sender, args);
             case "movehere" -> villagerMoveHere(sender, args);
@@ -403,8 +403,11 @@ public class MyVillageCommand implements CommandExecutor {
         Messenger.send(sender, true, "Villager '" + id + "' removed successfully", GREEN);
     }
 
-    private void villagerList(CommandSender sender) throws IOException {
-        //todo: args check
+    private void villagerList(CommandSender sender, String[] args) throws IOException {
+        if (args.length != 2) {
+            Messenger.send(sender, true, "Usage: /myvillage villager list", RED);
+            return;
+        }
 
         List<LambdaVillager> allVillagers = VillagersStorage.loadFromFile();
 
@@ -507,8 +510,11 @@ public class MyVillageCommand implements CommandExecutor {
         Messenger.send(sender, true, "Behavior '" + id + "' removed successfully", GREEN);
     }
 
-    private void behaviorList(CommandSender sender) throws IOException {
-        //todo: args check
+    private void behaviorList(CommandSender sender, String[] args) throws IOException {
+        if (args.length != 3) {
+            Messenger.send(sender, true, "Usage: /myvillage behavior list", RED);
+            return;
+        }
 
         List<LambdaBehavior> allBehaviors = BehaviorsStorage.loadFromFile();
 
