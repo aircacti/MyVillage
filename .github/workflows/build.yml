@@ -41,7 +41,7 @@ jobs:
 
       - name: Upload artifact for dev versions
         if: contains(steps.get_version.outputs.version, 'dev')
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MyVillage-${{ steps.get_version.outputs.version }}-${{ github.run_number }}-${{ steps.short_sha.outputs.sha }}.jar
           path: target/MyVillage.jar
