@@ -85,7 +85,7 @@ public class Helpers {
     }
 
     public static class InstructionPlaceholders {
-        private static final List<String> placeholders = Arrays.asList(
+        private static final List<String> placeholders = List.of(
                 "'<player>' - player nick"
         );
 
