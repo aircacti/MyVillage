@@ -22,12 +22,14 @@ jobs:
         distribution: temurin
         java-version: 21
 
-    - name: Cache Maven packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-maven-
+    - name: Manual cleanup before build
+      run: |
+        echo "Removing target directory and junk files..."
+        rm -rf target/*
+        find . -name '*.log' -delete
+        find . -name '*.tmp' -delete
+        find . -name '.DS_Store' -delete
+        find . -name '*.iml' -delete
 
     - name: Extract version from pom.xml
       id: get_version
@@ -36,13 +38,11 @@ jobs:
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "Extracted version is '$VERSION'"
 
-
     - name: Get short SHA
       id: short_sha
       run: |
         echo "sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
         echo "Short SHA is '${GITHUB_SHA::7}'"
-
 
     - name: Check if version is dev (case insensitive)
       id: check_dev
@@ -59,7 +59,7 @@ jobs:
         fi
 
     - name: Build JAR with Maven Shade plugin
-      run: mvn clean package
+      run: mvn clean package -U
 
     - name: List files in target after build
       run: ls -l target
