@@ -13,98 +13,100 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 21
+    - name: Set up JDK 21
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: 21
 
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
+    - name: Cache Maven packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-maven-
 
-      - name: Install xmllint
-        run: sudo apt-get update && sudo apt-get install -y libxml2-utils
+    - name: Install xmllint
+      run: sudo apt-get update && sudo apt-get install -y libxml2-utils
 
-      - name: Extract version from pom.xml
-        id: get_version
-        run: |
-          VERSION=$(xmllint --xpath "string(//project/version)" pom.xml)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+    - name: Extract version from pom.xml
+      id: get_version
+      run: |
+        # wyciągamy pierwszy <version>...</version> w pom.xml
+        VERSION=$(grep -m1 '<version>' pom.xml | sed -E 's:.*<version>([^<]+)</version>.*:\1:')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Debug version extracted
-        run: echo "Extracted version is '${{ steps.get_version.outputs.version }}'"
+    - name: Debug version extracted
+      run: echo "Extracted version is '${{ steps.get_version.outputs.version }}'"
 
-      - name: Get short SHA
-        id: short_sha
-        run: echo "sha=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+    - name: Get short SHA
+      id: short_sha
+      run: echo "sha=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
 
-      - name: Debug short SHA
-        run: echo "Short SHA is '${{ steps.short_sha.outputs.sha }}'"
+    - name: Debug short SHA
+      run: echo "Short SHA is '${{ steps.short_sha.outputs.sha }}'"
 
-      - name: Check if version is dev (case insensitive)
-        id: check_dev
-        run: |
-          version="${{ steps.get_version.outputs.version }}"
-          version_lower=$(echo "$version" | tr '[:upper:]' '[:lower:]')
-          echo "Lowercase version: $version_lower"
-          if echo "$version_lower" | grep -q "dev"; then
-            echo "is_dev=true" >> $GITHUB_OUTPUT
-            echo "Detected dev version."
-          else
-            echo "is_dev=false" >> $GITHUB_OUTPUT
-            echo "Detected stable version."
-          fi
+    - name: Check if version is dev (case insensitive)
+      id: check_dev
+      run: |
+        version="${{ steps.get_version.outputs.version }}"
+        version_lower=$(echo "$version" | tr '[:upper:]' '[:lower:]')
+        echo "Lowercase version is '$version_lower'"
+        if echo "$version_lower" | grep -q "dev"; then
+          echo "is_dev=true" >> $GITHUB_OUTPUT
+          echo "Detected dev version."
+        else
+          echo "is_dev=false" >> $GITHUB_OUTPUT
+          echo "Detected stable version."
+        fi
 
-      - name: Debug is_dev output
-        run: echo "is_dev=${{ steps.check_dev.outputs.is_dev }}"
+    - name: Debug is_dev
+      run: echo "is_dev = ${{ steps.check_dev.outputs.is_dev }}"
 
-      - name: Build JAR with Maven Shade plugin
-        run: mvn clean package
+    - name: Build JAR with Maven Shade plugin
+      run: mvn clean package
 
-      - name: List files in target after build
-        run: ls -l target
+    - name: List files in target after build
+      run: ls -l target
 
-      - name: Upload artifact for dev versions
-        if: steps.check_dev.outputs.is_dev == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: MyVillage-${{ steps.get_version.outputs.version }}-${{ github.run_number }}-${{ steps.short_sha.outputs.sha }}.jar
-          path: target/MyVillage.jar
+    - name: Upload artifact for dev versions
+      if: steps.check_dev.outputs.is_dev == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: MyVillage-${{ steps.get_version.outputs.version }}-${{ github.run_number }}-${{ steps.short_sha.outputs.sha }}.jar
+        path: target/MyVillage-*.jar
 
-      - name: List files in target after uploading dev artifact
-        if: steps.check_dev.outputs.is_dev == 'true'
-        run: ls -l target
+    - name: List files in target after uploading dev artifact
+      if: steps.check_dev.outputs.is_dev == 'true'
+      run: ls -l target
 
-      - name: Create GitHub Release for stable versions
-        if: steps.check_dev.outputs.is_dev == 'false'
-        id: create_release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: v${{ steps.get_version.outputs.version }}
-          name: Release v${{ steps.get_version.outputs.version }}
-          body: "Release of version ${{ steps.get_version.outputs.version }}."
-          draft: false
-          prerelease: false
+    - name: Create GitHub Release for stable versions
+      if: steps.check_dev.outputs.is_dev == 'false'
+      id: create_release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: v${{ steps.get_version.outputs.version }}
+        name: Release v${{ steps.get_version.outputs.version }}
+        body: "Release of version ${{ steps.get_version.outputs.version }}."
+        draft: false
+        prerelease: false
 
-      - name: List files in target after creating release
-        if: steps.check_dev.outputs.is_dev == 'false'
-        run: ls -l target
+    - name: List files in target after creating release
+      if: steps.check_dev.outputs.is_dev == 'false'
+      run: ls -l target
 
-      - name: Upload release asset
-        if: steps.check_dev.outputs.is_dev == 'false'
-        uses: softprops/action-gh-release@v1
-        with:
-          files: target/*-shaded.jar
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload release asset
+      if: steps.check_dev.outputs.is_dev == 'false'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.get_version.outputs.version }}
+        files: target/*-shaded.jar
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: List files in target after uploading release asset
-        if: steps.check_dev.outputs.is_dev == 'false'
-        run: ls -l target
+    - name: List files in target after uploading release asset
+      if: steps.check_dev.outputs.is_dev == 'false'
+      run: ls -l target
