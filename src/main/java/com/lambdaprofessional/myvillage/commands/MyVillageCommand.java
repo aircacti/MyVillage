@@ -399,6 +399,7 @@ public class MyVillageCommand implements CommandExecutor {
         }
 
         VillagersStorage.removeVillagerFromFile(id);
+        Spawninator.despawn(id);
         Messenger.send(sender, true, "Villager '" + id + "' removed successfully", GREEN);
     }
 
