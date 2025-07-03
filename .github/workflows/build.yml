@@ -1,0 +1,62 @@
+name: Build and Release MyVillage
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 16
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 16
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: Extract version from pom.xml
+        id: get_version
+        run: |
+          VERSION=$(xmllint --xpath "string(//project/version)" pom.xml)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build JAR with Maven Shade plugin
+        run: mvn clean package
+
+      - name: Upload artifact for dev versions
+        if: contains(steps.get_version.outputs.version, 'dev')
+        uses: actions/upload-artifact@v3
+        with:
+          name: MyVillage-${{ steps.get_version.outputs.version }}-${{ github.run_number }}-${{ github.sha::8 }}.jar
+          path: target/MyVillage.jar
+
+      - name: Create GitHub Release for stable versions
+        if: "!contains(steps.get_version.outputs.version, 'dev')"
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          body: "Release of version ${{ steps.get_version.outputs.version }}."
+          draft: false
+          prerelease: false
+
+      - name: Upload release asset
+        if: "!contains(steps.get_version.outputs.version, 'dev')"
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/MyVillage.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
