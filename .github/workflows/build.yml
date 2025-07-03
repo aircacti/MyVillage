@@ -32,6 +32,10 @@ jobs:
           VERSION=$(xmllint --xpath "string(//project/version)" pom.xml)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+      - name: Get short SHA
+        id: short_sha
+        run: echo "sha=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+
       - name: Build JAR with Maven Shade plugin
         run: mvn clean package
 
@@ -39,7 +43,7 @@ jobs:
         if: contains(steps.get_version.outputs.version, 'dev')
         uses: actions/upload-artifact@v3
         with:
-          name: MyVillage-${{ steps.get_version.outputs.version }}-${{ github.run_number }}-${{ github.sha.substring(0,8) }}.jar
+          name: MyVillage-${{ steps.get_version.outputs.version }}-${{ github.run_number }}-${{ steps.short_sha.outputs.sha }}.jar
           path: target/MyVillage.jar
 
       - name: Create GitHub Release for stable versions
