@@ -6,7 +6,7 @@
 
     <groupId>com.lambda-professional</groupId>
     <artifactId>MyVillage</artifactId>
-    <version>1.0</version>
+    <version>1.0-DEV</version>
     <packaging>jar</packaging>
 
     <name>MyVillage</name>
