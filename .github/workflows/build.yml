@@ -45,15 +45,26 @@ jobs:
       - name: Build JAR with Maven Shade plugin
         run: mvn clean package
 
+      - name: Check if version contains "dev" (case-insensitive)
+        id: check_dev
+        run: |
+          version="${{ steps.get_version.outputs.version }}"
+          version_lower=$(echo "$version" | tr '[:upper:]' '[:lower:]')
+          if [[ "$version_lower" == *"dev"* ]]; then
+            echo "is_dev=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_dev=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Upload artifact for dev versions
-        if: contains(toLower(steps.get_version.outputs.version), 'dev')
+        if: steps.check_dev.outputs.is_dev == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: MyVillage-${{ steps.get_version.outputs.version }}-${{ github.run_number }}-${{ steps.short_sha.outputs.sha }}.jar
           path: target/*-DEV-shaded.jar
 
       - name: Create GitHub Release for stable versions
-        if: not(contains(toLower(steps.get_version.outputs.version), 'dev'))
+        if: steps.check_dev.outputs.is_dev == 'false'
         id: create_release
         uses: ncipollo/release-action@v1
         with:
@@ -64,7 +75,7 @@ jobs:
           prerelease: false
 
       - name: Upload release asset
-        if: "!contains(steps.get_version.outputs.version, 'dev')"
+        if: steps.check_dev.outputs.is_dev == 'false'
         uses: softprops/action-gh-release@v1
         with:
           files: target/*-shaded.jar
