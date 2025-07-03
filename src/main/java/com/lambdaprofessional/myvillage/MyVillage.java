@@ -1,6 +1,6 @@
 package com.lambdaprofessional.myvillage;
 
-import com.lambdaprofessional.myvillage.Inators.Spawninator;
+import com.lambdaprofessional.myvillage.inators.Spawninator;
 import com.lambdaprofessional.myvillage.commands.MyVillageCommand;
 import com.lambdaprofessional.myvillage.configs.Hardcode;
 import com.lambdaprofessional.myvillage.events.VillagerDamageBlockListener;
@@ -19,7 +19,7 @@ public final class MyVillage extends JavaPlugin {
     @Override
     public void onEnable() {
 
-        version = getDescription().getVersion(); // alternative?
+        version = getDescription().getVersion(); // todo: alternative?
 
         if (!getDataFolder().exists()) {
             getDataFolder().mkdirs();
