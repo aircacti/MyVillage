@@ -1,6 +1,6 @@
 package com.lambdaprofessional.myvillage.events;
 
-import com.lambdaprofessional.myvillage.Inators.Spawninator;
+import com.lambdaprofessional.myvillage.inators.Spawninator;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,7 +14,5 @@ public class VillagerDamageBlockListener implements Listener {
             event.setCancelled(true);
         }
 
-//        PersistentDataContainer pdc = damaged.getPersistentDataContainer();
-//        event.getDamager().sendMessage(Component.text("-  " + pdc.has(Hardcode.KEY_MYVILLAGE_ID, PersistentDataType.STRING) + " / " +  pdc.get(Hardcode.KEY_MYVILLAGE_ID, PersistentDataType.STRING)));
     }
 }
