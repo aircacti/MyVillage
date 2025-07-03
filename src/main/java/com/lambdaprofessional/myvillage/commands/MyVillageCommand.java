@@ -1,6 +1,6 @@
 package com.lambdaprofessional.myvillage.commands;
 
-import com.lambdaprofessional.myvillage.Inators.Spawninator;
+import com.lambdaprofessional.myvillage.inators.Spawninator;
 import com.lambdaprofessional.myvillage.MyVillage;
 import com.lambdaprofessional.myvillage.configs.Hardcode;
 import com.lambdaprofessional.myvillage.configs.UserConfig;
@@ -71,16 +71,19 @@ public class MyVillageCommand implements CommandExecutor {
         String action = args[1].toLowerCase();
 
         switch (action) {
-            case "refresh" -> pluginRefresh(sender);
-            case "count" -> pluginCount(sender);
-            case "reload" -> pluginReload(sender);
-            case "config" -> pluginConfig(sender);
+            case "refresh" -> pluginRefresh(sender, args);
+            case "count" -> pluginCount(sender, args);
+            case "reload" -> pluginReload(sender, args);
+            case "config" -> pluginConfig(sender, args);
             default -> Messenger.send(sender, true, "Unknown plugin action: " + action, RED);
         }
     }
 
-    private void pluginConfig(CommandSender sender) {
-        //todo: args check
+    private void pluginConfig(CommandSender sender, String[] args) {
+        if (args.length != 2) {
+            Messenger.send(sender, true, "Usage: /myvillage plugin config", RED);
+            return;
+        }
 
         Messenger.send(sender, true, "Config.yml data:", GOLD);
 
@@ -89,22 +92,31 @@ public class MyVillageCommand implements CommandExecutor {
 
     }
 
-    private void pluginReload(CommandSender sender) {
-        //todo: args check
+    private void pluginReload(CommandSender sender, String[] args) {
+        if (args.length != 2) {
+            Messenger.send(sender, true, "Usage: /myvillage plugin reload", RED);
+            return;
+        }
 
         ConfigStorage.reload();
         Messenger.send(sender, true, "Config reloaded", GREEN);
     }
 
-    private void pluginRefresh(CommandSender sender) {
-        //todo: args check
+    private void pluginRefresh(CommandSender sender, String[] args) {
+        if (args.length != 2) {
+            Messenger.send(sender, true, "Usage: /myvillage plugin refresh", RED);
+            return;
+        }
 
         Spawninator.refresh();
         Messenger.send(sender, true, "Entities refreshed", GREEN);
     }
 
-    private void pluginCount(CommandSender sender) {
-        //todo: args check
+    private void pluginCount(CommandSender sender, String[] args) {
+        if (args.length != 2) {
+            Messenger.send(sender, true, "Usage: /myvillage plugin count", RED);
+            return;
+        }
 
         int expected = Spawninator.getExpectedVillagerCount();
         int actual = Spawninator.getCurrentVillagerCount();
