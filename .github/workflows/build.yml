@@ -39,7 +39,7 @@ jobs:
         if: contains(steps.get_version.outputs.version, 'dev')
         uses: actions/upload-artifact@v3
         with:
-          name: MyVillage-${{ steps.get_version.outputs.version }}-${{ github.run_number }}-${{ github.sha::8 }}.jar
+          name: MyVillage-${{ steps.get_version.outputs.version }}-${{ github.run_number }}-${{ github.sha.substring(0,8) }}.jar
           path: target/MyVillage.jar
 
       - name: Create GitHub Release for stable versions
